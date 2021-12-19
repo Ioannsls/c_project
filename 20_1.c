@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #define SHMSIZE 512
 #define BUF_SIZE 512
@@ -56,6 +57,8 @@ int main (){
 		perror("sem init");
 		return 2;
 	}
+	struct sigaction action;
+	memset(&action, 0, sizeof(action));
 	sigaction.sa_handler = term;
 	sigaction(SIGINT, &action, NULL);
 	sigaction(SIGTERM, &action, NULL);
