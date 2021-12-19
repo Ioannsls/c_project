@@ -30,10 +30,10 @@ int main (int argc, char* argv[]){
 		printf("Usage: %s\n", argv[0]);
 		return 1;
 	}
-	char *shm_name = "/clock";
+	const char *shm_name = "/clock";
 	int fd;
 	/* Open an Shared Memory Object for Read-/Write-Access */
-	if((fd = shm_open(shm_name, O_RDWR | O_CREAT, MODE)) < 0) {
+	if((fd = shm_open(shm_name, O_RDWR | O_CREAT | O_EXEL, 0644)) < 0) {
 		perror("\nshm_open() in Caretaker failed");
 		return 2;
 	}
