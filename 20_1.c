@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <time.h>
+#include <fcntl.h>
 
 #define SHMSIZE 512
 #define BUF_SIZE 512
