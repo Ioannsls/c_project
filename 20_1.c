@@ -24,7 +24,7 @@ int done = 0;
 void term(int signum) {
 	done = 1;
 }
-int main (){
+int main (int argc, char* argv[]){
 	char *shm_name = "SharedMemory";
 	int fd;
 	/* Open an Shared Memory Object for Read-/Write-Access */
