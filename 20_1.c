@@ -30,15 +30,17 @@ int main (int argc, char* argv[]){
 		printf("Usage: %s\n", argv[0]);
 		return 1;
 	}
-	char *shm_name = "SharedMemory";
+	char *shm_name = "/clock";
 	int fd;
 	/* Open an Shared Memory Object for Read-/Write-Access */
 	if((fd = shm_open(shm_name, O_RDWR | O_CREAT, MODE)) < 0) {
 		perror("\nshm_open() in Caretaker failed");
+		return 2;
 	}
 	/* Truncate Shared Memory Object to specific size */
 	if((ftruncate(fd, SHMSIZE) < 0)) {
 		perror("\nftruncate() in Caretaker failed");
+		return 3;
 	}
 
 	struct shmbuf *shmp = mmap(
@@ -52,7 +54,7 @@ int main (int argc, char* argv[]){
 	/* Create standart shmbuf*/
 	if (shmp == MAP_FAILED) {
 		perror("mmap");
-		return 2;
+		return 4;
 	}
 	time_t timer;
 	struct tm* tm_info;
@@ -60,7 +62,7 @@ int main (int argc, char* argv[]){
 	/*check sem is initialized*/
 	if (sem_init(&shmp->sem1, 1, 0) == -1){
 		perror("sem init");
-		return 3;
+		return 5;
 	}
 	struct sigaction action;
 	memset(&action, 0, sizeof(action));
@@ -72,12 +74,12 @@ int main (int argc, char* argv[]){
 		tm_info = localtime(&timer); /*set time*/
 		if (sem_wait(&shmp->sem1) == -1){
 			perror("sem init");
-			return 4;
+			return 6;
 		}
 		strftime(shmp->buf, 26, "%Y-%m-%d %H:%M:%S", tm_info); /*set format time*/
 		if (sem_post(&shmp->sem1) == -1){
 			perror("sem post");
-			return 5;
+			return 7;
 		}
 	}
 	shm_unlink(shm_name); /*remove shared memory*/
