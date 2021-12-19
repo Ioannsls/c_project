@@ -11,7 +11,6 @@
 #include <fcntl.h>
 #include <signal.h>
 
-#define SHMSIZE 512
 #define BUF_SIZE 512
 
 struct shmbuf {
@@ -59,7 +58,7 @@ int main (int argc, char* argv[]){
 	struct tm* tm_info;
 	timer = time(NULL);
 	/*check sem is initialized*/
-	if (sem_init(&shmp->sem1, 1, 0) == -1){
+	if (sem_init(&shmp->sem1, 1, 1) == -1){
 		perror("sem init");
 		return 5;
 	}
@@ -81,7 +80,7 @@ int main (int argc, char* argv[]){
 			perror("sem init");
 			return 6;
 		}
-		strftime(shmp->buf, 26, "%Y-%m-%d %H:%M:%S", tm_info); /*set format time*/
+		strftime(shmp->buf, sizeof(shmp->buf), "%Y-%m-%d %H:%M:%S", tm_info); /*set format time*/
 		if (sem_post(&shmp->sem1) == -1){
 			perror("sem post");
 			return 7;
