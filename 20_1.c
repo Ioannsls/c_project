@@ -41,6 +41,7 @@ int main (){
 			fd,
 			0
 			);
+	/* Create standart shmbuf*/
 	if (shmp == MAP_FAILED) {
 		perror("mmap");
 		return 1;
@@ -48,6 +49,7 @@ int main (){
 	time_t timer;
 	struct tm* tm_info;
 	timer = time(NULL);
+	/*check sem is initialized*/
 	if (sem_init(&shmp->sem1, 1, 0) == -1){
 		perror("sem init");
 		return 2;
@@ -57,17 +59,17 @@ int main (){
 	sigaction(SIGTERM, &action, NULL);
 	while(!done){
 		Sleep(1);
-		tm_info = localtime(&timer);
+		tm_info = localtime(&timer); /*set time*/
 		if (sem_wait(&shmp->sem1) == -1){
 			perror("sem init");
 			return 3;
 		}
-		strftime(shmp->buf, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+		strftime(shmp->buf, 26, "%Y-%m-%d %H:%M:%S", tm_info); /*set format time*/
 		if (sem_post(&shmp->sem1) == -1){
 			perror("sem post");
 			return 4;
 		}
 	}
-	shm_unlink(shm_name);
+	shm_unlink(shm_name); /*remove shared memory*/
 	return 0;
 }
