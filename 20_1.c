@@ -67,8 +67,14 @@ int main (int argc, char* argv[]){
 	struct sigaction action;
 	memset(&action, 0, sizeof(action));
 	action.sa_handler = term;
-	sigaction(SIGINT, &action, NULL);
-	sigaction(SIGTERM, &action, NULL);
+	if(sigaction(SIGINT, &action, NULL) < 0) {
+		perror("sigaction");
+		psignal(SIGINT, NULL);
+	}
+	if(sigaction(SIGTERM, &action, NULL) < 0) {
+		perror("sigaction");
+		psignal(SIGTERM, NULL);
+	}
 	while(!done){
 		sleep(1);
 		tm_info = localtime(&timer); /*set time*/
