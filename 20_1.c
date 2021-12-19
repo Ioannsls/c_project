@@ -32,7 +32,7 @@ int main (int argc, char* argv[]){
 	const char *shm_name = "/clock";
 	int fd;
 	/* Open an Shared Memory Object for Read-/Write-Access */
-	if((fd = shm_open(shm_name, O_RDWR | O_CREAT | O_EXEL, 0644)) < 0) {
+	if((fd = shm_open(shm_name, O_RDWR | O_CREAT | O_EXCL, 0644)) < 0) {
 		perror("\nshm_open() in Caretaker failed");
 		return 2;
 	}
@@ -46,7 +46,7 @@ int main (int argc, char* argv[]){
 			NULL,
 			sizeof(*shmp),
 			PROT_READ | PROT_WRITE,
-			MAP_SHARED | MAP_ANONYMOUS,
+			MAP_SHARED,
 			fd,
 			0
 			);
@@ -63,8 +63,8 @@ int main (int argc, char* argv[]){
 		perror("sem init");
 		return 5;
 	}
-	struct sigaction action;
-	memset(&action, 0, sizeof(action));
+	struct sigaction action = {};
+	action.sa_flags = 0;
 	action.sa_handler = term;
 	if(sigaction(SIGINT, &action, NULL) < 0) {
 		perror("sigaction");
