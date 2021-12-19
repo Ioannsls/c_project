@@ -36,7 +36,7 @@ int main (int argc, char* argv[]){
 		return 2;
 	}
 	/* Truncate Shared Memory Object to specific size */
-	if((ftruncate(fd, SHMSIZE) < 0)) {
+	if((ftruncate(fd, sysconf(_SC_PAGE_SIZE)) < 0)) {
 		perror("\nftruncate() in Caretaker failed");
 		return 3;
 	}
@@ -81,6 +81,7 @@ int main (int argc, char* argv[]){
 			return 6;
 		}
 		strftime(shmp->buf, sizeof(shmp->buf), "%Y-%m-%d %H:%M:%S", tm_info); /*set format time*/
+		printf("Now is %s\n", shmp->buf);
 		if (sem_post(&shmp->sem1) == -1){
 			perror("sem post");
 			return 7;
