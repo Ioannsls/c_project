@@ -54,11 +54,11 @@ int main (){
 		perror("sem init");
 		return 2;
 	}
-	action.sa_handler = term;
+	sigaction.sa_handler = term;
 	sigaction(SIGINT, &action, NULL);
 	sigaction(SIGTERM, &action, NULL);
 	while(!done){
-		Sleep(1);
+		sleep(1);
 		tm_info = localtime(&timer); /*set time*/
 		if (sem_wait(&shmp->sem1) == -1){
 			perror("sem init");
