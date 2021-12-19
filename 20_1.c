@@ -13,7 +13,6 @@
 
 #define SHMSIZE 512
 #define BUF_SIZE 512
-#define MODE S_IRUSR | S_IWUSR | S_IWGRP | S_IRGRP | S_IWOTH | S_IROTH
 
 struct shmbuf {
 	sem_t  sem1;            /* POSIX unnamed semaphore */ 
