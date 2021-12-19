@@ -59,7 +59,7 @@ int main (){
 	}
 	struct sigaction action;
 	memset(&action, 0, sizeof(action));
-	sigaction.sa_handler = term;
+	action.sa_handler = term;
 	sigaction(SIGINT, &action, NULL);
 	sigaction(SIGTERM, &action, NULL);
 	while(!done){
