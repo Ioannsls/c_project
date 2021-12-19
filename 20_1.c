@@ -62,6 +62,7 @@ int main (int argc, char* argv[]){
 		perror("sem init");
 		return 5;
 	}
+	//что-то про время, нужно писать с начала
 	struct sigaction action = {};
 	action.sa_flags = 0;
 	action.sa_handler = term;
