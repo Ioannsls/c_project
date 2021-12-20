@@ -74,13 +74,13 @@ int main (int argc, char* argv[]){
 	}
 	while(!done){
 		sleep(1);
-		timer = time(NULL);
-		tm_info = localtime(&timer); /*set time, лучше сделать по-другому*/
 		if (sem_wait(&shmp->sem1) == -1){
 			perror("sem init");
 			sem_destroy(&shmp->sem1);
 			return 6;
 		}
+		timer = time(NULL);
+		tm_info = localtime(&timer);
 		strftime(shmp->buf, sizeof(shmp->buf), "%Y-%m-%d %H:%M:%S", tm_info); /*set format time*/
 		printf("Now is %s\n", shmp->buf);
 		if (sem_post(&shmp->sem1) == -1){
