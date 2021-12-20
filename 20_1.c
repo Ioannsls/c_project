@@ -56,7 +56,6 @@ int main (int argc, char* argv[]){
 	}
 	time_t timer;
 	struct tm* tm_info;
-	timer = time(NULL);
 	/*check sem is initialized*/
 	if (sem_init(&shmp->sem1, 1, 1) == -1){
 		perror("sem init");
@@ -75,6 +74,7 @@ int main (int argc, char* argv[]){
 	}
 	while(!done){
 		sleep(1);
+		timer = time(NULL);
 		tm_info = localtime(&timer); /*set time, лучше сделать по-другому*/
 		if (sem_wait(&shmp->sem1) == -1){
 			perror("sem init");
