@@ -7,14 +7,17 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <errno.h>
- 
+#include <time.h>
+
+#define BUF_SIZE 512
 #define SHM_NAME "/clock"
 #define TIMESTR_SIZE 64
 volatile int g_terminate = 0;
  
-struct shared_buffer_t {
-    unsigned write_flag;
-    char string[TIMESTR_SIZE];
+struct shmbuf {
+	sem_t  sem1;            /* POSIX unnamed semaphore */
+	size_t cnt;             /* Number of bytes used in 'buf' */
+	char   buf[BUF_SIZE];   /* Data being transferred */
 };
  
 void handler(int sig) {
@@ -42,30 +45,38 @@ int main() {
         }
     }
  
-    void* p = mmap(
+    struct shmbuf *shmp = mmap(
         NULL,
         sysconf(_SC_PAGE_SIZE),
         PROT_READ | PROT_WRITE,
         MAP_SHARED,
         shm_des,
         0);
-    if (p == MAP_FAILED) {
+    if (shmp == MAP_FAILED) {
         perror("Failed to map shared memory");
         close(shm_des);
         unlink(SHM_NAME);
         return 3;
     }
+    time_t timer;
+    struct tm* tm_info;
     close(shm_des);
-    printf("Allocated page at [%p]\n", p);
-        
-    struct shared_buffer_t* buf = (struct shared_buffer_t*)p;
-    const char* time_str = (const char*)buf->string;
-    unsigned int read_flag;
+    printf("Allocated page at [%p]\n", shmp);
     while(!g_terminate) {
-        read_flag = buf->write_flag;
-        printf("[%.*s]\n", TIMESTR_SIZE, time_str);
-        if (read_flag != buf->write_flag)
-            continue;
+	if (sem_wait(&shmp->sem1) == -1) {
+		perror("sem init");
+		sem_destroy(&shmp->sem1);
+		return 4;
+	}
+	timer = time(NULL);
+	tm_info = localtime(&timer);
+	strftime(shmp->buf, sizeof(shmp->buf), "%Y-%m-%d %H:%M:%S", tm_info);
+        printf("[%.*s]\n", TIMESTR_SIZE, shmp->buf);
+	if (sem_post(&shmp->sem1) == -1){
+		perror("sem post");
+		sem_destroy(&shmp->sem1);
+		return 7;
+	}
         sleep(1);
     }
     printf("\nStopping client...\n");
