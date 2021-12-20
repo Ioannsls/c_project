@@ -62,7 +62,6 @@ int main (int argc, char* argv[]){
 		perror("sem init");
 		return 5;
 	}
-	//что-то про время, нужно писать с начала
 	struct sigaction action = {};
 	action.sa_flags = 0;
 	action.sa_handler = term;
@@ -76,18 +75,21 @@ int main (int argc, char* argv[]){
 	}
 	while(!done){
 		sleep(1);
-		tm_info = localtime(&timer); /*set time*/
+		tm_info = localtime(&timer); /*set time, лучше сделать по-другому*/
 		if (sem_wait(&shmp->sem1) == -1){
 			perror("sem init");
+			sem_destroy(&shmp->sem1);
 			return 6;
 		}
 		strftime(shmp->buf, sizeof(shmp->buf), "%Y-%m-%d %H:%M:%S", tm_info); /*set format time*/
 		printf("Now is %s\n", shmp->buf);
 		if (sem_post(&shmp->sem1) == -1){
 			perror("sem post");
+			sem_destroy(&shmp->sem1);
 			return 7;
 		}
 	}
 	shm_unlink(shm_name); /*remove shared memory*/
+	sem_destroy(&shmp->sem1);
 	return 0;
 }
